@@ -1,0 +1,21 @@
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+
+.card {
+    list-style-type: none;
+    padding: 1rem 1.2rem;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(var(--card-border-rgb), 0);
+    transition: background 200ms, border 200ms;
+}

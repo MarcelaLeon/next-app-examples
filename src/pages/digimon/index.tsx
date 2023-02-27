@@ -1,12 +1,11 @@
-import { GetStaticProps } from 'next';
 import Image from 'next/image';
-import styles from './../../styles/Home.module.css';
-import { Digimon } from './index';
-import { Props } from './index';
+import Link from 'next/link';
+import styles from './../../styles/Digimon.module.css';
 
+export type Digimon = { name: string, img: string, level: string }
 
-interface Params {
-    params: object
+export interface Props {
+    data: Digimon[]
 }
 
 export default function Home({ data }: Props) {
@@ -15,15 +14,17 @@ export default function Home({ data }: Props) {
             <main className={styles.main}>
                 <div>
                     <ul className={styles.list}>
-
                         {data?.map(digimon => (
+
                             <li key={digimon.name} className={styles.card}>
-                                <h2>{digimon.name}</h2>
+                                <Link href={'digimon/' + digimon.name}>
+                                    <h2>{digimon.name}</h2>
+                                </Link>
                                 <Image src={digimon.img} alt='digimon' width={300} height={350} />
                                 <p>{digimon.level}</p>
                             </li>
-                        ))}
 
+                        ))}
                     </ul>
                 </div>
             </main>
@@ -32,16 +33,15 @@ export default function Home({ data }: Props) {
 }
 
 
-
-/** Static Side Generation - SSG */
-export const getStaticProps: GetStaticProps = async (context: any) => {
-    const { id } = context.params
-    const response = await fetch('https://digimon-api.vercel.app/api/digimon/name/' + id)
+export const getStaticProps = async () => {
+    const response = await fetch('https://digimon-api.vercel.app/api/digimon')
     const data: Digimon[] = await response.json()
     return {
         props: {
             data
-        }
+        },
+        /**Como máximo va a a realizar un intento cada 10 segundos */
+        revalidate: 10
     }
 }
 
@@ -52,26 +52,12 @@ export const getStaticProps: GetStaticProps = async (context: any) => {
         'Cache-Control',
         'public, s-maxage=10, stale-while-revalidate=59'
     )
-    const response = await fetch('https://digimon-api.vercel.app/api/digimon/name/' + id)
+     const response = await fetch('https://digimon-api.vercel.app/api/digimon')
     const data: Digimon[] = await response.json()
     return {
         props: {
             data
-        }
+        },
+         revalidate: 10
     }
 } */
-
-export async function getStaticPaths() {
-    const response = await fetch('https://digimon-api.vercel.app/api/digimon')
-    const data: Digimon[] = await response.json()
-    const paths: Params[] = []
-    data.map((digimon) => {
-        paths.push({ params: { id: digimon.name } })
-    })
-
-    return {
-        //paths: [{ params: { id: 'Koromon' } }, { params: { id: 'Yokomon' } }],
-        paths: paths,
-        fallback: false, // can also be true or 'blocking'
-    }
-}
